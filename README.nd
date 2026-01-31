@@ -1,0 +1,39 @@
+# Cloud Run Hello Service
+
+This is my first Google Cloud Run project.
+
+## Overview
+
+This project deploys a small Python web service using Flask on **Google Cloud Run**.  
+It responds with a simple greeting message.
+
+## Features
+
+- Containerized Python app
+- Deployed on Cloud Run
+- Auto-scaling managed by Google
+- Public URL for access
+- Logging via Cloud Logging
+
+## Getting Started
+
+1. Clone the repo  
+2. Deploy to Cloud Run via GCP Console  
+3. Allow unauthenticated access
+
+## Live URL
+
+👉 https://cloudrunhelloservice-86586492757.asia-southeast1.run.app/
+
+## Tech Stack
+
+- Python
+- Flask
+- Docker
+- Google Cloud Run
+
+## What I Learned
+
+- How to containerize a Python app
+- How to deploy to Cloud Run
+- How to view logs in Cloud Logging
