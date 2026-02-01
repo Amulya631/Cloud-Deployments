@@ -3,35 +3,28 @@ from google.cloud import firestore
 from datetime import datetime
 
 app = Flask(__name__)
+
+# Firestore client (uses Cloud Run service account)
 db = firestore.Client()
 
 
-# ✅ Root URL (so the service URL works in browser)
+# --------------------------------------------------
+# Health check / Alive endpoint
+# --------------------------------------------------
 @app.route("/", methods=["GET"])
-def home():
+def health():
     return jsonify({
-        "status": "ok",
-        "message": "MiniRobo is running 🚀",
-        "usage": {
-            "endpoint": "/chat",
-            "method": "POST",
-            "body": {"message": "hi"}
-        }
+        "status": "MiniRobo alive 🚀"
     })
 
 
-# ✅ Chat endpoint
-@app.route("/chat", methods=["GET", "POST"])
+# --------------------------------------------------
+# Chat endpoint
+# --------------------------------------------------
+@app.route("/chat", methods=["POST"])
 def chat():
-    # Allow browser testing
-    if request.method == "GET":
-        return jsonify({
-            "info": "Send a POST request with JSON",
-            "example": {"message": "hello"}
-        })
-
     data = request.get_json(silent=True) or {}
-    user_message = data.get("message", "").lower()
+    user_message = data.get("message", "").strip().lower()
 
     if not user_message:
         return jsonify({"error": "Message is required"}), 400
@@ -52,3 +45,10 @@ def chat():
     })
 
     return jsonify({"reply": bot_reply})
+
+
+# --------------------------------------------------
+# Local run (Cloud Run ignores this, uses gunicorn)
+# --------------------------------------------------
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
