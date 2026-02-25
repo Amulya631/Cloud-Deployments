@@ -1,54 +1,66 @@
 from flask import Flask, request, jsonify
-from google.cloud import firestore
-from datetime import datetime
 
 app = Flask(__name__)
 
-# Firestore client (uses Cloud Run service account)
-db = firestore.Client()
+# Level 1 Robot
+@app.route("/")
+def hello():
+    return "Hi 👋 I'm now a Helper Robot!"
 
+# Level 2 Feature 1
+# Calculator Robot
+@app.route("/add", methods=["POST"])
+def add_numbers():
 
-# --------------------------------------------------
-# Health check / Alive endpoint
-# --------------------------------------------------
-@app.route("/", methods=["GET"])
-def health():
+    data = request.json
+
+    num1 = data["num1"]
+    num2 = data["num2"]
+
+    result = num1 + num2
+
     return jsonify({
-        "status": "MiniRobo alive 🚀"
+        "result": result
     })
 
 
-# --------------------------------------------------
-# Chat endpoint
-# --------------------------------------------------
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json(silent=True) or {}
-    user_message = data.get("message", "").strip().lower()
+# Level 2 Feature 2
+# BMI Calculator
+@app.route("/bmi", methods=["POST"])
+def bmi():
 
-    if not user_message:
-        return jsonify({"error": "Message is required"}), 400
+    data = request.json
 
-    # Simple reply logic
-    if "hi" in user_message or "hello" in user_message:
-        bot_reply = "Hi 👋 I’m your Cloud Run bot!"
-    elif "who are you" in user_message:
-        bot_reply = "I’m a Python bot running on Google Cloud Run 🚀"
-    else:
-        bot_reply = "I heard you! I’ll get smarter soon 😊"
+    weight = data["weight"]
+    height = data["height"] / 100
 
-    # Store chat in Firestore
-    db.collection("chats").add({
-        "user_message": user_message,
-        "bot_reply": bot_reply,
-        "timestamp": datetime.utcnow()
+    bmi_value = weight / (height * height)
+
+    return jsonify({
+        "BMI": round(bmi_value,2)
     })
 
-    return jsonify({"reply": bot_reply})
+
+# Level 2 Feature 3
+# Form validation
+
+@app.route("/register", methods=["POST"])
+def register():
+
+    data = request.json
+
+    age = data["age"]
+
+    if age < 0:
+
+        return jsonify({
+            "error": "Invalid age"
+        })
+
+    return jsonify({
+        "message": "Registration successful"
+    })
 
 
-# --------------------------------------------------
-# Local run (Cloud Run ignores this, uses gunicorn)
-# --------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
